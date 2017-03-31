@@ -11,7 +11,21 @@
       new google.maps.Size(15, 15),
       new google.maps.Point(0, 0),
       new google.maps.Point(4.5, 4.5)
-    );
+    ),
+    markerImageGreen = new google.maps.MarkerImage('green_circle.png',
+      new google.maps.Size(15, 15),
+      new google.maps.Point(0, 0),
+      new google.maps.Point(4.5, 4.5)
+    ),
+    markerImageTypes = {
+      'DevicesSeen': markerImageGreen,
+      'BluetoothDevicesSeen': markerImage
+    },
+    uncertaintyCircleColors = {
+      'DevicesSeen': 'LightGreen',
+      'BluetoothDevicesSeen': 'RoyalBlue'
+    };
+      
 
   // Removes all markers
   function clearAll() {
@@ -59,13 +73,14 @@
       map.setCenter(pos);
       clientMarker.setMap(map);
       clientMarker.setPosition(pos);
+      clientMarker.setIcon(markerImageTypes[client.eventType]);
       clientUncertaintyCircle = new google.maps.Circle({
         map: map,
         center: pos,
         radius: client.unc,
-        fillColor: 'RoyalBlue',
+        fillColor: uncertaintyCircleColors[client.eventType],
         fillOpacity: 0.25,
-        strokeColor: 'RoyalBlue',
+        strokeColor: uncertaintyCircleColors[client.eventType],
         strokeWeight: 1
       });
     } else {
@@ -73,12 +88,6 @@
     }
   }
 
-  // Looks up a single MAC address
-  function lookup(mac) {
-    $.getJSON('/clients/' + mac, function (response) {
-      track(response);
-    });
-  }
 
   // Adds a marker for a single client within the "view all" perspective
   function addMarker(client) {
@@ -86,7 +95,7 @@
       position: new google.maps.LatLng(client.lat, client.lng),
       map: map,
       mac: client.mac,
-      icon: markerImage
+      icon: markerImageTypes[client.eventType]
     });
     google.maps.event.addListener(m, 'click', function () {
       infoWindow.setContent("<div>" + client.mac + "</div> (<a class='client-filter' href='#' data-mac='" +
@@ -109,6 +118,20 @@
     clients.forEach(addMarker);
   }
 
+  // Looks up a single MAC address
+  function lookup(mac) {
+    $.getJSON('/clients/' + mac, function (response) {
+      track(response);
+    });
+  }
+
+  // Looks up all clients of an event type
+  function lookupEventType(eventType) {
+    $.getJSON('/event_type/'+ eventType, function (response) {
+      trackAll(response);
+    });
+  }
+
   // Looks up all MAC addresses
   function lookupAll() {
     $('#last-mac').text("Looking up all clients...");
@@ -123,6 +146,14 @@
     if (lastEvent !== null) { window.clearInterval(lastEvent); }
     lookup(lastMac);
     lastEvent = window.setInterval(lookup, 20000, lastMac);
+  }
+  
+  // Begins a task timer to reload all MACs of a particular eventType every 20 seconds
+  function startLookupEventType(params) {
+    eventType = params.data.eventType;
+    if (lastEvent !== null) { window.clearInterval(lastEvent); }
+    lookupEventType(eventType);
+    lastEvent = window.setInterval(lookupEventType, 20000, eventType);
   }
 
   // Begins a task timer to reload all MACs every 20 seconds
@@ -154,6 +185,10 @@
     $('#track').click(startLookup).bind("enterKey", startLookup);
 
     $('#all').click(startLookupAll);
+
+    $('#bluetooth').click({eventType: 'BluetoothDevicesSeen'}, startLookupEventType);
+
+    $('#wifi').click({eventType: 'DevicesSeen'}, startLookupEventType);
 
     $(document).on("click", ".client-filter", function (e) {
       e.preventDefault();
