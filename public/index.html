@@ -9,7 +9,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>CMX push API demo app</title>
+    <title>Scanning API Location App</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="sample.css">
@@ -22,16 +22,22 @@
     <div id="masthead">
       <div id="masthead-content">
         <img src="https://meraki.cisco.com/img/cisco-meraki.png"/>
+        <a id="url" href="https://developers.meraki.com">developers.meraki.com</a>
       </div>
     </div>
     <div id="content">
-      <h1>CMX API Demo</h1>
+      <h1>Scanning API Location App</h1>
       <div id="mac-address">
         <input id="mac-field" type="text" placeholder="Enter MAC address" />&nbsp;
         <button id="track">Follow</button>&nbsp;
-        <button id="all">View All</button>&nbsp;
-        <button id="bluetooth">View Bluetooth Only</button>&nbsp;
-        <button id="wifi">View Wi-Fi Only</button>
+        <select id="event-select">
+          <option value="All">All Devices</option>
+          <option value="DevicesSeen">Wireless Only</option>
+          <option value="BluetoothDevicesSeen">Bluetooth Only</option>
+        <select>
+        <select id="floor-select">
+          <option value="All" selected>All floors</option>
+        </select>
       </div>
       <div id="last-mac"></div>
       <div class="small"><span class="bold">Clients in the wrong place?</span> Make sure your APs are placed properly in Dashboard.</div>

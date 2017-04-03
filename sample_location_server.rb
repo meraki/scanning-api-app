@@ -16,25 +16,21 @@
 # web app.
 #
 # To use this webapp:
-#
-#   - Ensure you have ruby 1.9 installed
-#   - Ensure that you have the sinatra gem installed; if you don't, do
-#       gem install sinatra
-#   - Ensure that you have the data_mapper gem installed; if you don't, do
-#       gem install data_mapper
+#   - Ensure that you have ruby 1.9.3
+#   - Ensure that you have set up a Redis instance and saved its URL
+#     as the environment variable REDIS_URL
+#   - Ensure that you have the validator and secret saved as 
+#     VALIDATOR and SECRET environment variables (more below)
+#   - Set up your database and put it's URL in the DATABASE_URL
+#     environment variable  
+#   - If you are not running with Heroku, run 'bundle install' to ensure your 
+#     machine has the required gems.
 #
 # Let's say you plan to run this server on a host called pushapi.example.com.
 # Go to Meraki's Dashboard and configure the CMX Location Push API with the url
 # "http://pushapi.example.com:4567/events", choose a secret, and make note of
-# the validation code that Dashboard provides. Pass the secret and validation
-# code to this server when you start it:
-#
-#   sample_location_server.rb <secret> <validator>
-#
-# You can change the bind interface (default 0.0.0.0) and port (default 4567)
-# using Sinatra's -o and -p option flags:
-#
-#   sample_location_server.rb -o <interface> -p <port> <secret> <validator>
+# the validation code that Dashboard provides. This secret and validator should
+# be set in the environment variables SECRET and VALIDATOR.
 #
 # Now click the "Validate server" link in CMX Location Push API configuration in
 # Dashboard. Meraki's servers will perform a get to this server, and you will
@@ -155,6 +151,13 @@ get '/events' do
   VALIDATOR
 end
 
+# Return the distinct values for floors
+# This is used to populate the floors dropdown
+get '/floors' do
+  floors = repository(:default).adapter.select('select distinct floors from clients')
+  JSON.generate(floors)
+end
+
 # Respond to Meraki's push events. Here we're just going
 # to write the most recent events to our database.
 post '/events' do
@@ -166,8 +169,6 @@ post '/events' do
   Resque.enqueue(LocationData, request.body.read)
   ""
 end
-
-# Serve client data from the database.
 
 # This matches
 #    /clients/<mac>
@@ -185,19 +186,20 @@ end
 # This matches
 #   /clients OR /clients/
 # and returns a JSON blob of all clients.
+# Optional query parameters eventType and floors can be used to 
+# filter the clients
 get %r{/clients/?} do
+  query = {:seenEpoch.gt => (Time.new - 300).to_i}
+  if params[:eventType] and params[:eventType] != "All"
+    query[:eventType] = params[:eventType]
+  end
+
+  if params[:floors] and params[:floors] != "All"
+    query[:floors] = params[:floors]
+  end
+
   content_type :json
-  clients = Client.all(:seenEpoch.gt => (Time.new - 300).to_i)
+  clients = Client.all(query) #Client.all(:seenEpoch.gt => (Time.new - 300).to_i)
   JSON.generate(clients)
 end
 
-# This matches
-#  /event_type/<eventType>
-# and returns a JSON blob of clients with the given
-# event type. (Eg: BluetoothDevicesSeen)
-get '/event_type/:eventType' do |m|
-  puts "Request event type is #{m}"
-  content_type :json
-  clients = Client.all(:eventType => m)
-  JSON.generate(clients)
-end

@@ -7,6 +7,7 @@
     allMarkers = [],                            // The markers when we are in "View All" mode
     lastMac = "",                               // The last requested MAC to follow
     infoWindow = new google.maps.InfoWindow(),  // The marker tooltip
+    lookupFrequency = 5000,                    // Frequency of the lookup (in milliseconds)
     markerImage = new google.maps.MarkerImage('blue_circle.png',
       new google.maps.Size(15, 15),
       new google.maps.Point(0, 0),
@@ -113,7 +114,7 @@
     clearAll();
     if (clients.length === 0) {
       $('#last-mac').text("Found no clients (if you just started the web server, you may need to wait a few minutes to receive pushes from Meraki)");
-    } else { $('#last-mac').text("Found " + clients.length + " clients (reloading every 20 seconds)"); }
+    } else { $('#last-mac').text("Found " + clients.length + " clients (reloading every " + lookupFrequency/1000 + " seconds)"); }
     clientUncertaintyCircle.setMap(null);
     clients.forEach(addMarker);
   }
@@ -125,17 +126,22 @@
     });
   }
 
-  // Looks up all clients of an event type
-  function lookupEventType(eventType) {
-    $.getJSON('/event_type/'+ eventType, function (response) {
-      trackAll(response);
+  // Looks up the list of floors
+  function lookupFloorList() {
+    $.getJSON('/floors', function(floorList){
+      $.each(floorList, function(index, floor){
+        if(floor === ""){
+          floor = "None";
+        }
+        $("#floor-select").append($("<option></option>").val(floor).html(floor));
+      });
     });
   }
 
   // Looks up all MAC addresses
-  function lookupAll() {
-    $('#last-mac').text("Looking up all clients...");
-    $.getJSON('/clients/', function (response) {
+  function lookupAll(query) {
+    $('#last-mac').text("Looking up clients...");
+    $.getJSON('/clients/', query, function (response) {
       trackAll(response);
     });
   }
@@ -145,22 +151,23 @@
     lastMac = $('#mac-field').val().trim();
     if (lastEvent !== null) { window.clearInterval(lastEvent); }
     lookup(lastMac);
-    lastEvent = window.setInterval(lookup, 20000, lastMac);
+    lastEvent = window.setInterval(lookup, lookupFrequency, lastMac);
   }
   
-  // Begins a task timer to reload all MACs of a particular eventType every 20 seconds
-  function startLookupEventType(params) {
-    eventType = params.data.eventType;
-    if (lastEvent !== null) { window.clearInterval(lastEvent); }
-    lookupEventType(eventType);
-    lastEvent = window.setInterval(lookupEventType, 20000, eventType);
-  }
-
   // Begins a task timer to reload all MACs every 20 seconds
   function startLookupAll() {
+    floors =  $('#floor-select').val().trim(),
+    eventType = $('#event-select').val().trim()
+    if(floors == "None"){
+      floors = "";
+    }
+    query = {
+      floors: floors,
+      eventType: eventType
+    }
     if (lastEvent !== null) { window.clearInterval(lastEvent); }
-    lastEvent = window.setInterval(lookupAll, 20000);
-    lookupAll();
+    lastEvent = window.setInterval(lookupAll, lookupFrequency, query);
+    lookupAll(query);
   }
 
   // This is called after the DOM is loaded, so we can safely bind all the
@@ -184,11 +191,9 @@
 
     $('#track').click(startLookup).bind("enterKey", startLookup);
 
-    $('#all').click(startLookupAll);
+    lookupFloorList();
 
-    $('#bluetooth').click({eventType: 'BluetoothDevicesSeen'}, startLookupEventType);
-
-    $('#wifi').click({eventType: 'DevicesSeen'}, startLookupEventType);
+    $("#event-select, #floor-select").change(startLookupAll);
 
     $(document).on("click", ".client-filter", function (e) {
       e.preventDefault();

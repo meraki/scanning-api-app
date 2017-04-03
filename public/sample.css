@@ -44,7 +44,7 @@ body {
   margin-bottom: 10px;
 }
 
-#mac-field {
+#mac-field, #floor-select, #event-select {
   width: 30%;
   height: 35px;
   margin-bottom: 20px;
@@ -56,6 +56,10 @@ body {
   font-size: 16px;
   font-weight: 100;
   min-width: 136px;
+}
+
+#event-select {
+  width: 20%;
 }
 
 #map-wrapper {
@@ -101,7 +105,7 @@ button, input {
   width: 11%;
 }
 
-button {
+button, #url {
   height: 35px;
   border: none;
   background: #737373;
@@ -119,3 +123,11 @@ button:hover{
   background: #616060;
 }
 
+#url {
+  float: right;
+  background-color: #78be20;
+  margin: 32px;
+  margin-right: 0;
+  text-decoration: none;
+  padding: 8px;
+}

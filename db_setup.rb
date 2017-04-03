@@ -15,8 +15,8 @@ class Client
   property :manufacturer, String
   property :os,         String
   property :ssid,       String
-  property :floors,     String
-  property :eventType,       String
+  property :floors,     String, :index => true
+  property :eventType,  String
 end
 
 # Heroku does not accept sqlite3 as a database, and we use postgresql instead
