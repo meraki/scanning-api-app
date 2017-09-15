@@ -1,3 +1,4 @@
+require 'digest'
 require 'resque'
 require 'json'
 require_relative 'db_setup'
@@ -12,6 +13,7 @@ else
 end
 
 SECRET = ENV['SECRET']
+HASH_KEY = ENV['HASH_KEY'] ? ENV['HASH_KEY'] : nil
 
 # Resque job to parse incoming JSON and create/update database rows
 class LocationData
@@ -35,7 +37,11 @@ class LocationData
     map['data']['observations'].each do |c|
       loc = c['location']
       next if loc == nil
-      name = c['clientMac']
+      if HASH_KEY
+        name = Digest::SHA256.hexdigest(c['clientMac']+HASH_KEY)[-12..-1].scan(/\w{2}/).join(":")
+      else
+        name = c['clientMac']
+      end
       lat = loc['lat']
       lng = loc['lng']
       seenString = c['seenTime']

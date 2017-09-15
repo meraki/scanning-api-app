@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 ruby '1.9.3'
+gem 'digest'
 gem 'sinatra'
 gem 'unicorn'
 gem 'data_mapper'
