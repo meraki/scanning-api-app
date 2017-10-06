@@ -189,7 +189,7 @@ end
 # Optional query parameters eventType and floors can be used to 
 # filter the clients
 get %r{/clients/?} do
-  query = {:seenEpoch.gt => (Time.new - 300).to_i}
+  query = {:seenEpoch.gt => (Time.new - 900).to_i}
   if params[:eventType] and params[:eventType] != "All"
     query[:eventType] = params[:eventType]
   end

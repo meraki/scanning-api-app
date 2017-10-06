@@ -7,7 +7,7 @@
     allMarkers = [],                            // The markers when we are in "View All" mode
     lastMac = "",                               // The last requested MAC to follow
     infoWindow = new google.maps.InfoWindow(),  // The marker tooltip
-    lookupFrequency = 5000,                    // Frequency of the lookup (in milliseconds)
+    lookupFrequency = 20000,                    // Frequency of the lookup (in milliseconds)
     markerImage = new google.maps.MarkerImage('blue_circle.png',
       new google.maps.Size(15, 15),
       new google.maps.Point(0, 0),
