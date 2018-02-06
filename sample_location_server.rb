@@ -198,6 +198,11 @@ get %r{/clients/?} do
     query[:floors] = params[:floors]
   end
 
+  if Client.count >= 6000
+    logger.warn "Number of rows above 6000. Deleting all rows."
+    Client.destroy
+  end
+
   content_type :json
   clients = Client.all(query) #Client.all(:seenEpoch.gt => (Time.new - 300).to_i)
   JSON.generate(clients)
