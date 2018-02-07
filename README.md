@@ -41,8 +41,9 @@ This application show you how to get started using the [Cisco Meraki](https://me
 - Clone the repo into this directory by running `git clone git@github.com:meraki/scanning-api-app.git` (this will clone the project into the subdirectory `scanning-api-app`).
 - Alternatively, [download the ZIP file](https://github.com/meraki/cmx-api-app/archive/master.zip) and unzip it into your project directory.
 3. App setup
-- In the new directory, run ```heroku create <app_name>``` - this will create your app on Heroku for the url `app_name.herokuapp.com`. You can also leave `<app_name>` empty to let Heroku pick a random app name for you.
+- In the new directory, run ```heroku create <app_name> --stack cedar-14``` - this will create your app on Heroku for the url `app_name.herokuapp.com`. You can also leave `<app_name>` empty to let Heroku pick a random app name for you. Cedar-14 is the only Heroku stack that supports ruby-1.9.3 now, so you have to include that option.
 - Set the environment variables using the following command
+- 
   
   `heroku config:set VALIDATOR=<validator> SECRET=<secret>`
   
