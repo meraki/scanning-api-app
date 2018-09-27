@@ -200,6 +200,6 @@ get %r{/clients/?} do
 
   content_type :json
   clients = Client.all(query) #Client.all(:seenEpoch.gt => (Time.new - 300).to_i)
-  JSON.generate(clients)
+  clients.to_json
 end
 

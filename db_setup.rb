@@ -1,4 +1,4 @@
-require 'data_mapper'
+require 'datamapper'
 
 # ---- Define data model ---------------
 

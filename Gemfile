@@ -1,10 +1,11 @@
 source 'https://rubygems.org'
-ruby '1.9.3'
-gem 'digest'
-gem 'sinatra'
-gem 'unicorn'
-gem 'data_mapper'
+ruby '2.5.1'
 gem 'json'
+gem 'sinatra'
+gem 'iconv', '~> 1.0.3'
+gem 'unicorn'
+gem 'datamapper', '1.0'
+gem 'redis', '<4'
 gem 'resque'
 
 group :production do
