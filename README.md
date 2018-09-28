@@ -41,7 +41,8 @@ This application show you how to get started using the [Cisco Meraki](https://me
 - Clone the repo into this directory by running `git clone git@github.com:meraki/scanning-api-app.git` (this will clone the project into the subdirectory `scanning-api-app`).
 - Alternatively, [download the ZIP file](https://github.com/meraki/cmx-api-app/archive/master.zip) and unzip it into your project directory.
 3. App setup
-- In the new directory, run ```heroku create <app_name> --stack cedar-14``` - this will create your app on Heroku for the url `app_name.herokuapp.com`. You can also leave `<app_name>` empty to let Heroku pick a random app name for you. Cedar-14 is the only Heroku stack that supports ruby-1.9.3 now, so you have to include that option.
+- In the new directory, run ```heroku create <app_name>``` - this will create your app on Heroku for the url `app_name.herokuapp.com`. You can also leave `<app_name>` empty to let Heroku pick a random app name for you.
+
 - Set the environment variables using the following command
 - 
   
@@ -69,14 +70,14 @@ This application show you how to get started using the [Cisco Meraki](https://me
 
 #### Non-Heroku
 - This app can be directly pushed to Heroku. To run locally, you can use the gem [foreman](https://github.com/ddollar/foreman). 
-	- Ensure you've got `ruby 1.9.3` installed, and then run `bundle install` from the app's directory.
+	- Ensure you've got `ruby 2.5.1` installed, and then run `bundle install` from the app's directory.
 	- Set the environment variables as shown above(after you've set up your databases). 
 	- Additionally, set the `PORT` environmental variable to the port you want the app to listen on. (Eg: 4567)
 	- Run `gem install foreman` and then run the app with `foreman start` to run the commands in the Procfile and start your server.
 
 ### Software requirements:
 
-- When running without Heroku, ensure you have Ruby 1.9.3 installed. If you don’t, consider using [RVM](https://rvm.io) to install and manage your Ruby versions.
+- When running without Heroku, ensure you have Ruby 2.5.1 installed. If you don’t, consider using [RVM](https://rvm.io) to install and manage your Ruby versions.
 
 #### Gems:
 - Refer to the Gemfile for the required gems
