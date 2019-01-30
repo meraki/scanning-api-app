@@ -47,6 +47,7 @@ class LocationData
       seenString = c['seenTime']
       seenEpoch = c['seenEpoch']
       floors = map['data']['apFloors'] == nil ? "" : map['data']['apFloors'].join
+      tags = map['data']['apTags'] == nil ? "" : map['data']['apTags'].join
       logger.info "AP #{map['data']['apMac']} on #{map['data']['apFloors']}: #{c}"
       next if (seenEpoch == nil || seenEpoch == 0)  # This probe is useless, so ignore it
       client = Client.first_or_create(:mac => name)
@@ -57,7 +58,8 @@ class LocationData
                               :manufacturer => c['manufacturer'], :os => c['os'],
                               :ssid => c['ssid'],
                               :floors => floors,
-                              :eventType => map['type']
+                              :eventType => map['type'],
+                              :tags => tags
                             }
         client.save
       end
